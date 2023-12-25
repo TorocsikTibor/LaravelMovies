@@ -13,6 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('app');
-});
+Route::get('/', [\App\Http\Controllers\MoviesController::class, 'index'])->name('home');
+Route::get('/{search}', [\App\Http\Controllers\MoviesController::class, 'getSearchedMovies']);

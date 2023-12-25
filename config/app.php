@@ -1,5 +1,7 @@
 <?php
 
+use App\Services\MovieService;
+use App\Services\SearchService;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
@@ -182,7 +184,8 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'Example' => App\Facades\Example::class,
+        'searchService' => SearchService::class,
+        'MovieService' => MovieService::class,
     ])->toArray(),
 
 ];
