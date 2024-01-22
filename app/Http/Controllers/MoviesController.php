@@ -23,7 +23,8 @@ class MoviesController extends Controller
 
     public function index(): View|Application|Factory
     {
-        return view('app');
+        $movies = Movie::all();
+        return view('app', ['movies' => $movies]);
     }
 
     public function getSearchedMovies(string $search): JsonResponse
