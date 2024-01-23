@@ -1,9 +1,7 @@
 <template>
-    <!--    <h1>{{ movies }}</h1>-->
     <div class="container">
         <div class="row justify-content-center">
             <div class="card-group mt-3">
-                <!--            <div class="row">-->
                 <div v-for="movie in movies" :key="movie.id">
                     <div class="col sm-3">
                         <div class="m-2">
@@ -18,7 +16,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!--                    </div>-->
                     </div>
                 </div>
             </div>
@@ -42,7 +39,12 @@
         transform: translateX(-100%);
     }
 }
-/* Add any additional styling as needed */
+
+/*.card-img-top {*/
+/*    object-fit: cover; !* Adjust as needed: 'cover', 'contain', 'fill', etc. *!*/
+/*    width: 180px; !* Set your desired width *!*/
+/*    height: 240px; !* Set your desired height *!*/
+/*}*/
 </style>
 
 <script setup>
