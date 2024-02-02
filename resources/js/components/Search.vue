@@ -54,7 +54,7 @@ export default {
     methods: {
         async submitSearch() {
             try {
-                const response = await axios.get(`/${this.searchText}`);
+                const response = await axios.get(`/search/${this.searchText}`);
                 this.responseData = response.data.addedMovies;
             } catch (error) {
                 this.error = error.message;

@@ -2,7 +2,13 @@
 
 @section('content')
         <div id="app" class="d-flex">
-            <app :movies="{{ $movies->toJSON() }}" inline-template>
+            <app :movies="{{ $movies->toJSON() }}"
+                 :logout="{{ json_encode(route('logout')) }}"
+                 :login="{{ json_encode(route('login')) }}"
+                 :register="{{ json_encode(route('register')) }}"
+                 :user="{{ auth()->user() }}"
+                 csrf="{{ csrf_token() }}"
+                 inline-template>
             </app>
         </div>
 @endsection

@@ -71,74 +71,39 @@
                     </a>
                 </li>
             </ul>
+            <hr>
+
+            <div v-if="user">
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-emoji-angry-fill" viewBox="0 0 16 16">
+                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16M4.053 4.276a.5.5 0 0 1 .67-.223l2 1a.5.5 0 0 1 .166.76c.071.206.111.44.111.687C7 7.328 6.552 8 6 8s-1-.672-1-1.5c0-.408.109-.778.285-1.049l-1.009-.504a.5.5 0 0 1-.223-.67zm.232 8.157a.5.5 0 0 1-.183-.683A4.5 4.5 0 0 1 8 9.5a4.5 4.5 0 0 1 3.898 2.25.5.5 0 1 1-.866.5A3.5 3.5 0 0 0 8 10.5a3.5 3.5 0 0 0-3.032 1.75.5.5 0 0 1-.683.183M10 8c-.552 0-1-.672-1-1.5 0-.247.04-.48.11-.686a.502.502 0 0 1 .166-.761l2-1a.5.5 0 1 1 .448.894l-1.009.504c.176.27.285.64.285 1.049 0 .828-.448 1.5-1 1.5"/>
+                            </svg>
+                        </div>
+                        <strong>{{ user.name }}</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                        <form ref="logoutForm" :action="logout" method="POST" style="display: none;">
+                            <input type="hidden" name="_token" :value="csrf" />
+                        </form>
+                        <li><a class="dropdown-item" @click.prevent="performLogout">Sign out</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div v-else>
+                <a class="btn btn-light btn-sm mb-2" :href="login">Login</a>
+                <br>
+                <a class="btn btn-light btn-sm" :href="register">Registration</a>
+            </div>
         </div>
     </main>
-
     <div class="flex-grow-1">
         <component :movies="moviesJSON" :is="currentView"/>
     </div>
-
-
-
-    <!--    <main class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px; height: 100vh;">-->
-    <!--        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">-->
-    <!--            <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>-->
-    <!--            <span class="fs-4">Sidebar</span>-->
-    <!--        </a>-->
-    <!--        <hr>-->
-    <!--        <ul class="nav nav-pills flex-column mb-auto">-->
-    <!--            <li class="nav-item">-->
-    <!--                <a href="#" class="nav-link active" aria-current="page">-->
-    <!--                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>-->
-    <!--                    Home-->
-    <!--                </a>-->
-    <!--            </li>-->
-    <!--            <li>-->
-    <!--                <a href="#" class="nav-link text-white">-->
-    <!--                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>-->
-    <!--                    Dashboard-->
-    <!--                </a>-->
-    <!--            </li>-->
-    <!--            <li>-->
-    <!--                <a href="#" class="nav-link text-white">-->
-    <!--                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>-->
-    <!--                    Orders-->
-    <!--                </a>-->
-    <!--            </li>-->
-    <!--            <li>-->
-    <!--                <a href="#" class="nav-link text-white">-->
-    <!--                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>-->
-    <!--                    Products-->
-    <!--                </a>-->
-    <!--            </li>-->
-    <!--            <li>-->
-    <!--                <a href="#" class="nav-link text-white">-->
-    <!--                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>-->
-    <!--                    Customers-->
-    <!--                </a>-->
-    <!--            </li>-->
-    <!--        </ul>-->
-    <!--        <hr>-->
-    <!--        <div class="dropdown">-->
-    <!--            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">-->
-    <!--                <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">-->
-    <!--                <strong>mdo</strong>-->
-    <!--            </a>-->
-    <!--            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">-->
-    <!--                <li><a class="dropdown-item" href="#">New project...</a></li>-->
-    <!--                <li><a class="dropdown-item" href="#">Settings</a></li>-->
-    <!--                <li><a class="dropdown-item" href="#">Profile</a></li>-->
-    <!--                <li><hr class="dropdown-divider"></li>-->
-    <!--                <li><a class="dropdown-item" href="#">Sign out</a></li>-->
-    <!--            </ul>-->
-    <!--        </div>-->
-    <!--    </main>-->
-
 </template>
 
 <script setup>
-
-
 import {ref, computed} from 'vue'
 import ShowMovies from './ShowMovies.vue'
 import Search from './Search.vue'
@@ -146,15 +111,27 @@ import Search from './Search.vue'
 const routes = {
     '/': ShowMovies,
     '/search': Search
-}
+};
 
 const props = defineProps({
-    movies: Array
-})
+    movies: Array,
+    logout: String,
+    login: String,
+    register: String,
+    csrf: String,
+    user: Object,
+});
 
-let moviesJSON = JSON.parse(JSON.stringify(props.movies))
+let moviesJSON = JSON.parse(JSON.stringify(props.movies));
 
-const currentPath = ref(window.location.hash)
+const currentPath = ref(window.location.hash);
+const logoutForm = ref(null);
+
+const performLogout = () => {
+    logoutForm.value.submit();
+};
+
+
 
 window.addEventListener('hashchange', () => {
     currentPath.value = window.location.hash
@@ -163,4 +140,5 @@ window.addEventListener('hashchange', () => {
 const currentView = computed(() => {
     return routes[currentPath.value.slice(1) || '/']
 })
+
 </script>

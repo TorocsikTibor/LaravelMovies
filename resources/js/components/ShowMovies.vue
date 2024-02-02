@@ -39,15 +39,9 @@
         transform: translateX(-100%);
     }
 }
-
-/*.card-img-top {*/
-/*    object-fit: cover; !* Adjust as needed: 'cover', 'contain', 'fill', etc. *!*/
-/*    width: 180px; !* Set your desired width *!*/
-/*    height: 240px; !* Set your desired height *!*/
-/*}*/
 </style>
 
 <script setup>
-const props = defineProps(['movies'])
-console.log(props.movies)
+defineProps(['movies'])
+
 </script>
