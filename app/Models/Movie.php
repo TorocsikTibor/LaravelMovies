@@ -18,4 +18,9 @@ class Movie extends Model
     ];
     protected $table = 'movies';
 
+    public function watchlists()
+    {
+        return $this->belongsToMany(Watchlist::class)->using(MovieWatchlist::class);
+    }
+
 }

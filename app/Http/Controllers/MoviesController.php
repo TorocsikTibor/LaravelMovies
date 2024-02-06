@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
+use App\Models\Watchlist;
 use App\Services\MovieService;
 use App\Services\SearchService;
 use Illuminate\Contracts\View\Factory;
@@ -24,7 +25,9 @@ class MoviesController extends Controller
     public function index(): View|Application|Factory
     {
         $movies = Movie::all();
-        return view('app', ['movies' => $movies]);
+        $watchlist = Watchlist::all();
+
+        return view('app', ['movies' => $movies, 'watchlist' => $watchlist]);
     }
 
     public function getSearchedMovies(string $search): JsonResponse

@@ -50,7 +50,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link text-white">
+                    <a href="#/watchlist/create" class="nav-link text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              class="bi bi-plus-circle" viewBox="0 0 16 16">
                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
@@ -61,7 +61,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link text-white">
+                    <a href="#/watchlist/show" class="nav-link text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              class="bi bi-list" viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
@@ -99,7 +99,7 @@
         </div>
     </main>
     <div class="flex-grow-1">
-        <component :movies="moviesJSON" :is="currentView"/>
+        <component :movies="moviesJSON" :user="user" :is="currentView"/>
     </div>
 </template>
 
@@ -107,10 +107,14 @@
 import {ref, computed} from 'vue'
 import ShowMovies from './ShowMovies.vue'
 import Search from './Search.vue'
+import CreateWatchlist from './CreateWatchlist.vue'
+import ShowWatchlist from './ShowWatchlist.vue'
 
 const routes = {
     '/': ShowMovies,
-    '/search': Search
+    '/search': Search,
+    '/watchlist/create': CreateWatchlist,
+    '/watchlist/show': ShowWatchlist,
 };
 
 const props = defineProps({
@@ -130,8 +134,6 @@ const logoutForm = ref(null);
 const performLogout = () => {
     logoutForm.value.submit();
 };
-
-
 
 window.addEventListener('hashchange', () => {
     currentPath.value = window.location.hash

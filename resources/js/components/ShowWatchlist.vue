@@ -1,0 +1,172 @@
+<template>
+    <div class="container">
+        <div class="row justify-content-center">
+            <h2>Your Watchlists</h2>
+            <div class="row">
+                <div v-for="watchlist in watchlists" :key="watchlist.id" class="col-sm-6 p-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ watchlist.name }}</h5>
+                            <button @click="showMovies(watchlist.movies)" class="btn btn-primary m-2">Show Movies</button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">Add collaborator</button>
+                            <div class="dropdown-menu p-4">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Collaborator email</label>
+                                    <input v-model="collaboratorEmail" type="email" class="form-control" name="email">
+                                    <button @click="addCollaborator(watchlist.id)" type="submit" class="btn btn-light">
+                                        Send</button>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary m-2" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">Who see this?</button>
+                            <div class="dropdown-menu p-4">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Member email</label>
+                                    <input v-model="memberEmail" type="email" class="form-control" name="email">
+                                    <button @click="addMember(watchlist.id)" type="submit" class="btn btn-light">
+                                        Send</button>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+                <div v-if="moviesVisible">
+                    <div class="container">
+                        <div class="card-group mt-3">
+                            <div v-for="movie in movies" :key="movie.id">
+                                <div class="col sm-3">
+                                    <div class="m-2">
+                                        <div class="card border-dark mb-3">
+                                            <img v-bind:src="'/storage/' + movie.poster_path" width="240"
+                                                 height="360">
+                                            <div class="card-body scrolling-text">
+                                                <h6 class="card-title">{{ movie.title }}</h6>
+                                            </div>
+                                            <div class="card-footer">
+                                                <button type="button" class="btn btn-primary m-1"
+                                                        data-bs-toggle="modal"
+                                                        :data-bs-target="'#exampleModal' + movie.id">
+                                                    More
+                                                </button>
+                                                <button type="button" class="btn btn-primary"
+                                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                                        data-bs-auto-close="outside">
+                                                    +
+                                                </button>
+                                                <div class="dropdown-menu p-4">
+                                                    <div class="mb-3">
+                                                        <div v-for="watchlist in watchlists" :key="watchlist.id">
+                                                            <button @click="addToWatchlist(movie.id, watchlist.id)"
+                                                                    type="submit" class="btn btn-light">
+                                                                {{ watchlist.name }}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" :id="'exampleModal' + movie.id" tabindex="-1"
+                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">{{ movie.title }}</h5>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-sm-8">
+                                                        <img v-bind:src="'/storage/' + movie.poster_path"
+                                                             width="500" height="700">
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <p><strong>Release date:</strong> {{ movie.release_date }}
+                                                        </p>
+                                                        <p><strong>Vote average:</strong> {{ movie.vote_average }}
+                                                        </p>
+                                                        <p><strong>Vote count:</strong> {{ movie.vote_count }}</p>
+                                                        <p><strong>Overview:</strong> {{ movie.overview }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Close
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+
+import {onMounted, ref} from "vue";
+
+const props = defineProps({
+    user: Object,
+});
+
+let userId = props.user.id;
+let watchlists = ref([]);
+const moviesVisible = ref(false);
+const movies = ref();
+let collaboratorEmail = ref();
+let memberEmail = ref();
+
+const showMovies = (watchlistMovies) => {
+    movies.value = watchlistMovies;
+    moviesVisible.value = true;
+}
+
+const addCollaborator = async (watchlistId) => {
+    let data = {
+        'email': collaboratorEmail,
+        'watchlistId': watchlistId,
+    }
+
+    try {
+        const response = await axios.post('api/watchlist/collaborator/add', data);
+        console.log(response.data);
+    } catch (error) {
+        console.error('Error record to watchlist', error.message);
+    }
+};
+
+
+const addMember = async (watchlistId) => {
+    let data = {
+        'email': collaboratorEmail,
+        'watchlistId': watchlistId,
+    }
+
+    try {
+        const response = await axios.post('api/watchlist/member/add', data);
+        console.log(response.data);
+    } catch (error) {
+        console.error('Error record to watchlist', error.message);
+    }
+};
+
+
+onMounted(async () => {
+    try {
+        const response = await axios.get('api/watchlist/show/' + userId);
+        watchlists.value = response.data;
+    } catch (error) {
+        console.error('Error fetching watchlist:', error.message);
+    }
+});
+
+
+</script>

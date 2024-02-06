@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('content')
-        <div id="app" class="d-flex">
+        <div id="app">
             <app :movies="{{ $movies->toJSON() }}"
                  :logout="{{ json_encode(route('logout')) }}"
                  :login="{{ json_encode(route('login')) }}"

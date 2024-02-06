@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\MoviesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +22,7 @@ Route::get('/test', function () {
 
 Route::get('/', [MoviesController::class, 'index'])->name('home');
 Route::get('/search/{search}', [MoviesController::class, 'getSearchedMovies']);
+Route::post('/watchlist/create', [WatchlistController::class, 'create'])->name('createWatchlist');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
