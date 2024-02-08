@@ -22,9 +22,7 @@ class MovieController extends Controller
 
     public function index(): View|Application|Factory
     {
-        $movies = $this->movieService->getAllMovie();
-
-        return view('app', ['movies' => $movies]);
+        return view('app');
     }
 
     public function getSearchedMovies(string $search): JsonResponse
@@ -37,5 +35,12 @@ class MovieController extends Controller
         }
 
         return response()->json([ 'addedMovies' => $searchedMovie]);
+    }
+
+    public function getAllMovie()
+    {
+        $movie = $this->movieService->getAllMovie();
+
+        return response()->json($movie);
     }
 }

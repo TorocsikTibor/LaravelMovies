@@ -3,13 +3,13 @@
 namespace App\Repositories;
 
 use App\Models\Movie;
-use Illuminate\Database\Eloquent\Collection;
+
 
 class MovieRepository
 {
-    public function getAll(): Collection
+    public function getAll()
     {
-        return Movie::all();
+        return Movie::paginate(20);
     }
 
     public function updateOrCreate(array $movie)

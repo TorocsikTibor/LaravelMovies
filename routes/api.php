@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MovieController;
 use App\Http\Controllers\WatchlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,3 +25,4 @@ Route::get('/watchlist/show/{id}', [WatchlistController::class, 'show']);
 Route::post('/watchlist/movie/add', [WatchlistController::class, 'addMovie']);
 Route::get('/watchlist/movie/list', [WatchlistController::class, 'getWatchlist']);
 Route::post('/watchlist/member/add', [WatchlistController::class, 'addMember']);
+Route::get('/movie', [MovieController::class, 'getAllMovie']);

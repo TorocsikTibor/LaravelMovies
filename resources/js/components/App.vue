@@ -105,7 +105,7 @@
         </div>
     </main>
     <div class="flex-grow-1">
-        <component :movies="moviesJSON" :user="user" :is="currentView"/>
+        <component :user="user" :is="currentView"/>
     </div>
 </template>
 
@@ -124,15 +124,12 @@ const routes = {
 };
 
 const props = defineProps({
-    movies: Array,
     logout: String,
     login: String,
     register: String,
     csrf: String,
     user: Object,
 });
-
-let moviesJSON = JSON.parse(JSON.stringify(props.movies));
 
 const currentPath = ref(window.location.hash);
 const logoutForm = ref(null);
