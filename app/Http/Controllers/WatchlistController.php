@@ -2,44 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MovieWatchlist;
-use App\Models\User;
-use App\Models\UserWatchlist;
-use App\Models\Watchlist;
+use App\Services\WatchlistService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class WatchlistController extends Controller
 {
-    public function getWatchlist()
+    private WatchlistService $watchlistService;
+
+    public function __construct(WatchlistService $watchlistService)
     {
-        return response()->json(Watchlist::with('movies')->get());
+        $this->watchlistService = $watchlistService;
+    }
+
+    public function getWatchlist(): JsonResponse
+    {
+        return response()->json($this->watchlistService->getWatchlist());
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        return response()->json($this->watchlistService->getUserWatchlist($id));
     }
 
     public function create(Request $request): JsonResponse
     {
-        $name = $request->input('name');
-        $userId = $request->input('userId');
-
-        $watchlist = Watchlist::create([
-           'name' =>  $name,
-            'creator_user_id' => $userId,
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'userId' => 'required|numeric',
         ]);
+        $validated = $validator->validated();
+        $createdWatchlist = $this->watchlistService->create($validated);
 
-        return response()->json($watchlist);
+        return response()->json($createdWatchlist);
     }
 
-    public function addMovie(Request $request)
+    public function addMovie(Request $request): JsonResponse
     {
-        $watchListId = $request->input('watchlistId');
-        $movieId = $request->input('movieId');
+        $validator = Validator::make($request->all(), [
+            'watchlistId' => 'required|string',
+            'movieId' => 'required|numeric',
+        ]);
+        $validated = $validator->validated();
 
-        $watchlistCheck = MovieWatchlist::where('watchlist_id', $watchListId)->where('movie_id', $movieId)->get();
+        $watchlistCheck = $this->watchlistService->checkWatchlist($validated);
+
         if ($watchlistCheck->isEmpty()) {
-            $addMovie = MovieWatchlist::create([
-                'watchlist_id' => $watchListId,
-                'movie_id' => $movieId,
-            ]);
+            $addMovie = $this->watchlistService->createMovieWatchlist($validated);
 
             return response()->json($addMovie);
         }
@@ -47,37 +57,18 @@ class WatchlistController extends Controller
         return response()->json("Already added.");
     }
 
-    public function addCollaborator(Request $request)
+    public function addMember(Request $request): JsonResponse
     {
-        $email = $request->input('email');
-        $watchlistId = $request->input('watchlistId');
-
-        $userId = User::where('email', $email)->first('id');
-
-
-        $addCollaborator = UserWatchlist::create([
-            'watchlist_id' => $watchlistId,
-            'user_id' => $userId['id'],
-            'permission_type' => 2,
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'watchlistId' => 'required|numeric',
+            'memberType' => 'required|numeric',
         ]);
+        $validated = $validator->validated();
 
-        return response()->json($addCollaborator);
-    }
+        $userId = $this->watchlistService->getUser($validated['email']);
+        $addMember = $this->watchlistService->addMember($validated['watchlistId'], $userId['id'], $validated['memberType']);
 
-    public function addMember(Request $request)
-    {
-        $email = $request->input('email');
-        $watchlistId = $request->input('watchlistId');
-
-        $userId = User::where('email', $email)->first('id');
-
-
-        $addCollaborator = UserWatchlist::create([
-            'watchlist_id' => $watchlistId,
-            'user_id' => $userId['id'],
-            'permission_type' => 1,
-        ]);
-
-        return response()->json($addCollaborator);
+        return response()->json($addMember);
     }
 }

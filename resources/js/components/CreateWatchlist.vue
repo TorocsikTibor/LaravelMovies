@@ -33,7 +33,7 @@ const saveWatchlist = async () => {
     }
 
     try {
-        const response = await axios.post(`/watchlist/create`, data);
+        const response = await axios.post(`api/watchlist/create`, data);
         responseData = response.data;
     } catch (error) {
         this.error = error.message;

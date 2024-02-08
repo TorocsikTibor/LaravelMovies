@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\MoviesController;
+use App\Http\Controllers\MovieController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Route;
@@ -20,9 +20,8 @@ Route::get('/test', function () {
     return view('welcome');
 });
 
-Route::get('/', [MoviesController::class, 'index'])->name('home');
-Route::get('/search/{search}', [MoviesController::class, 'getSearchedMovies']);
-Route::post('/watchlist/create', [WatchlistController::class, 'create'])->name('createWatchlist');
+Route::get('/', [MovieController::class, 'index'])->name('home');
+Route::get('/search/{search}', [MovieController::class, 'getSearchedMovies']);
 
 Route::get('/dashboard', function () {
     return view('dashboard');

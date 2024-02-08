@@ -5,15 +5,25 @@ namespace App\Services;
 use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\MovieGenre;
+use App\Repositories\GenreRepository;
+use App\Repositories\MovieGenreRepository;
+use App\Repositories\MovieRepository;
 use Illuminate\Support\Facades\Storage;
 
 class MovieService
 {
-    protected SearchService $searchService;
+    private SearchService $searchService;
+    private MovieRepository $movieRepository;
+    private MovieGenreRepository $movieGenreRepository;
+    private GenreRepository $genreRepository;
 
-    public function __construct(SearchService $searchService)
+
+    public function __construct(SearchService $searchService, MovieRepository $movieRepository, MovieGenreRepository $movieGenreRepository, GenreRepository $genreRepository)
     {
         $this->searchService = $searchService;
+        $this->movieRepository = $movieRepository;
+        $this->movieGenreRepository = $movieGenreRepository;
+        $this->genreRepository = $genreRepository;
     }
 
     public function saveMovies(mixed $movieArray): array
@@ -23,29 +33,15 @@ class MovieService
         $firstThreeMovie = array_slice($movies['results'], 0, 3);
 
         foreach ($firstThreeMovie as $movie) {
-            $saveMovie = Movie::updateOrCreate(
-              [
-                  'title' => $movie['title'],
-                  'release_date' => $movie['release_date'],
-              ],
-              [
-                  'overview' => $movie['overview'],
-                  'poster_path' => ltrim($movie['poster_path'], "/"),
-                  'vote_average' => $movie['vote_average'],
-                  'vote_count' => $movie['vote_count'],
-              ]
-            );
+            $saveMovie = $this->movieRepository->updateOrCreate($movie);
 
             if (isset($movie['poster_path'])) {
                 $this->saveMovieImage($movie['poster_path']);
             }
             $movieGenres = $this->convertGenre($movie['genre_ids']);
 
-            foreach ($movieGenres as $movieGenre) {
-                $addGenre = new MovieGenre;
-                $addGenre->movie_id = $saveMovie->id;
-                $addGenre->genre_id = $movieGenre;
-                $addGenre->save();
+            foreach ($movieGenres as $movieGenreId) {
+                $this->movieGenreRepository->create($saveMovie->id, $movieGenreId);
             }
 
             $createdMovies[] = $saveMovie;
@@ -58,13 +54,13 @@ class MovieService
     {
         $apiGenres = $this->searchService->getMovieGenres();
         $apiGenres = collect($apiGenres->genres);
-        $genres = Genre::all();
+        $genres = $this->genreRepository->getAll();
         $newGenreIds = [];
 
         foreach ($movieGenres as $movieGenre) {
-                $apiGenreId = $apiGenres->firstwhere('id', $movieGenre);
-                $convertedIds = $genres->firstWhere('name', $apiGenreId->name);
-                $newGenreIds[] += $convertedIds->id;
+            $apiGenreId = $apiGenres->firstwhere('id', $movieGenre);
+            $convertedIds = $genres->firstWhere('name', $apiGenreId->name);
+            $newGenreIds[] += $convertedIds->id;
         }
 
         return $newGenreIds;
@@ -78,6 +74,11 @@ class MovieService
 //        $filename = date('YmdHis') . $posterPath;
         $filename = $posterPath;
         Storage::disk('public')->put($filename, $imageContent);
+    }
+
+    public function getAllMovie()
+    {
+        return $this->movieRepository->getAll();
     }
 
 }

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Movie;
-use App\Models\Watchlist;
 use App\Services\MovieService;
 use App\Services\SearchService;
 use Illuminate\Contracts\View\Factory;
@@ -11,10 +9,10 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 
-class MoviesController extends Controller
+class MovieController extends Controller
 {
-    protected SearchService $searchService;
-    protected MovieService $movieService;
+    private SearchService $searchService;
+    private MovieService $movieService;
 
     public function __construct(SearchService $searchService, MovieService $movieService)
     {
@@ -24,16 +22,15 @@ class MoviesController extends Controller
 
     public function index(): View|Application|Factory
     {
-        $movies = Movie::all();
-        $watchlist = Watchlist::all();
+        $movies = $this->movieService->getAllMovie();
 
-        return view('app', ['movies' => $movies, 'watchlist' => $watchlist]);
+        return view('app', ['movies' => $movies]);
     }
 
     public function getSearchedMovies(string $search): JsonResponse
     {
         $getApiQuery = $this->searchService->getMovieDBApiQuery($search);
-        $searchedMovie = Movie::where('title', 'LIKE', '%'.$search.'%')->get();
+        $searchedMovie = $this->searchService->searchInTitle($search);
 
         if ($searchedMovie->isEmpty()) {
             $searchedMovie = $this->movieService->saveMovies($getApiQuery);
