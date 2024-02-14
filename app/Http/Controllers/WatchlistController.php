@@ -26,6 +26,11 @@ class WatchlistController extends Controller
         return response()->json($this->watchlistService->getUserWatchlist($id));
     }
 
+    public function getPermissionUserWatchlist(int $id): JsonResponse
+    {
+        return response()->json($this->watchlistService->getPermissionUserWatchlist($id));
+    }
+
     public function create(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -40,8 +45,12 @@ class WatchlistController extends Controller
 
     public function addMovie(Request $request): JsonResponse
     {
+//        $userId = $request->input('userId');
+//        $checkUser = User::find($userId);
+
+
         $validator = Validator::make($request->all(), [
-            'watchlistId' => 'required|string',
+            'watchlistId' => 'required|numeric',
             'movieId' => 'required|numeric',
         ]);
         $validated = $validator->validated();
@@ -54,7 +63,7 @@ class WatchlistController extends Controller
             return response()->json($addMovie);
         }
 
-        return response()->json("Already added.");
+        return response()->json($validated);
     }
 
     public function addMember(Request $request): JsonResponse
@@ -67,8 +76,15 @@ class WatchlistController extends Controller
         $validated = $validator->validated();
 
         $userId = $this->watchlistService->getUser($validated['email']);
+
+
         $addMember = $this->watchlistService->addMember($validated['watchlistId'], $userId['id'], $validated['memberType']);
 
         return response()->json($addMember);
+    }
+
+    public function deleteFromList(int $watchlistId, int $movieId)
+    {
+        return response()->json($this->watchlistService->deleteFromList($watchlistId, $movieId));
     }
 }

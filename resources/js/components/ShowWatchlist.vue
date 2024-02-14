@@ -7,9 +7,10 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">{{ watchlist.name }}</h5>
-                            <button @click="showMovies(watchlist.movies)" class="btn btn-primary m-2">Show Movies
+                            <button @click="showMovies(watchlist.movies, watchlist.id)" class="btn btn-primary m-2">Show Movies
                             </button>
-                            <button type="button" class="btn btn-success m-2" data-bs-toggle="dropdown"
+                            <button type="button" :hidden="watchlist.users?.[0]?.pivot?.permission_type === 1"
+                                    class="btn btn-success m-2" data-bs-toggle="dropdown"
                                     aria-expanded="false" data-bs-auto-close="outside">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                                      class="bi bi-person-add" viewBox="0 0 16 16">
@@ -51,34 +52,37 @@
                     <div class="container">
                         <div class="card-group mt-3">
                             <div v-for="movie in movies" :key="movie.id">
-                                <div class="col sm-3">
-                                    <div class="m-2">
-                                        <div class="card border-dark mb-3">
-                                            <img v-bind:src="'/storage/' + movie.poster_path" width="240"
-                                                 height="360">
-                                            <div class="card-body scrolling-text">
-                                                <h6 class="card-title">{{ movie.title }}</h6>
-                                            </div>
-                                            <div class="card-footer">
-                                                <button type="button" class="btn btn-primary m-1"
-                                                        data-bs-toggle="modal"
-                                                        :data-bs-target="'#exampleModal' + movie.id">
-                                                    More
-                                                </button>
-                                                <button type="button" class="btn btn-primary"
-                                                        data-bs-toggle="dropdown" aria-expanded="false"
-                                                        data-bs-auto-close="outside">
-                                                    +
-                                                </button>
-                                                <div class="dropdown-menu p-4">
-                                                    <div class="mb-3">
-                                                        <div v-for="watchlist in watchlists" :key="watchlist.id">
-                                                            <button @click="addToWatchlist(movie.id, watchlist.id)"
-                                                                    type="submit" class="btn btn-light">
-                                                                {{ watchlist.name }}
-                                                            </button>
+                                <div v-show="!movie.deleted">
+                                    <div class="col sm-3">
+                                        <div class="m-2">
+                                            <div class="card border-dark mb-3">
+                                                <img v-bind:src="'/storage/' + movie.poster_path" width="240"
+                                                     height="360">
+                                                <div class="card-body scrolling-text">
+                                                    <h6 class="card-title">{{ movie.title }}</h6>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <button type="button" class="btn btn-primary m-1"
+                                                            data-bs-toggle="modal"
+                                                            :data-bs-target="'#exampleModal' + movie.id">
+                                                        More
+                                                    </button>
+                                                    <button type="button" class="btn btn-primary"
+                                                            data-bs-toggle="dropdown" aria-expanded="false"
+                                                            data-bs-auto-close="outside">
+                                                        +
+                                                    </button>
+                                                    <div class="dropdown-menu p-4">
+                                                        <div class="mb-3">
+                                                            <div v-for="watchlist in watchlists" :key="watchlist.id">
+                                                                <button @click="addToWatchlist(movie.id, watchlist.id)"
+                                                                        type="submit" class="btn btn-light">
+                                                                    {{ watchlist.name }}
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <button @click="deleteFromList(movie.id)" type="button" class="btn btn-danger m-1">Delete</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -138,10 +142,12 @@ const moviesVisible = ref(false);
 const movies = ref();
 let memberEmail = ref();
 let selectedMemberType = ref(null);
+let watchlistId = ref();
 
-const showMovies = (watchlistMovies) => {
+const showMovies = (watchlistMovies, id) => {
     movies.value = watchlistMovies;
     moviesVisible.value = true;
+    watchlistId = id;
 }
 
 const addMember = async (watchlistId) => {
@@ -154,13 +160,24 @@ const addMember = async (watchlistId) => {
     }
 
     try {
-        const response = await axios.post('api/watchlist/member/add', data);
-        console.log(response.data);
+        await axios.post('api/watchlist/member/add', data);
     } catch (error) {
         console.error('Error record to watchlist', error.message);
     }
 };
 
+const deleteFromList = async (movieId) => {
+    try {
+        await axios.delete('api/watchlist/movie/delete/' + watchlistId + '/' + movieId);
+        const movieToDelete = movies.value.find(movie => movie.id === movieId);
+
+        if (movieToDelete) {
+            movieToDelete.deleted = true;
+        }
+    } catch (error) {
+        console.error('Error record to watchlist', error.message);
+    }
+}
 
 onMounted(async () => {
     try {
@@ -169,7 +186,6 @@ onMounted(async () => {
     } catch (error) {
         console.error('Error fetching watchlist:', error.message);
     }
+
 });
-
-
 </script>

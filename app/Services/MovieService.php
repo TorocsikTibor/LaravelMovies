@@ -18,8 +18,13 @@ class MovieService
     private GenreRepository $genreRepository;
 
 
-    public function __construct(SearchService $searchService, MovieRepository $movieRepository, MovieGenreRepository $movieGenreRepository, GenreRepository $genreRepository)
-    {
+    public function __construct
+    (
+        SearchService $searchService,
+        MovieRepository $movieRepository,
+        MovieGenreRepository $movieGenreRepository,
+        GenreRepository $genreRepository
+    ) {
         $this->searchService = $searchService;
         $this->movieRepository = $movieRepository;
         $this->movieGenreRepository = $movieGenreRepository;
@@ -29,8 +34,10 @@ class MovieService
     public function saveMovies(mixed $movieArray): array
     {
         $movies = $movieArray;
+
+        $sortedMovies = collect($movies['results'])->sortByDesc('vote_count', SORT_NUMERIC)->values()->all();
         $createdMovies = [];
-        $firstThreeMovie = array_slice($movies['results'], 0, 3);
+        $firstThreeMovie = array_slice($sortedMovies, 0, 3);
 
         foreach ($firstThreeMovie as $movie) {
             $saveMovie = $this->movieRepository->updateOrCreate($movie);

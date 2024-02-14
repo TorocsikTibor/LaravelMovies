@@ -6,6 +6,7 @@ use App\Repositories\MovieWatchlistRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\UserWatchlistRepository;
 use App\Repositories\WatchlistRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 class WatchlistService
 {
@@ -22,14 +23,19 @@ class WatchlistService
         $this->userRepository = $userRepository;
     }
 
-    public function getWatchlist(): \Illuminate\Database\Eloquent\Collection|array
+    public function getWatchlist(): Collection|array
     {
         return $this->watchlistRepository->getWatchlist();
     }
 
-    public function getUserWatchlist(int $id): \Illuminate\Database\Eloquent\Collection|array
+    public function getUserWatchlist(int $id): Collection|array
     {
         return $this->watchlistRepository->getUserWatchlist($id);
+    }
+
+    public function getPermissionUserWatchlist(int $id): Collection|array
+    {
+        return $this->watchlistRepository->getPermissionUserWatchlist($id);
     }
 
     public function create(array $validated)
@@ -55,5 +61,10 @@ class WatchlistService
     public function getUser($email)
     {
         return $this->userRepository->searchByEmail($email);
+    }
+
+    public function deleteFromList($watchlistId, $movieId)
+    {
+        return $this->movieWatchlistRepository->delete($watchlistId, $movieId);
     }
 }

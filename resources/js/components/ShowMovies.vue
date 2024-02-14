@@ -121,6 +121,7 @@ const addToWatchlist = async (movieId, watchlistId) => {
     let data = {
         'watchlistId': watchlistId,
         'movieId': movieId,
+        // 'userId': userId
     }
 
     try {
@@ -151,11 +152,10 @@ onMounted(async () => {
 
     await fetchMovies(currentPage.value);
     try {
-        const response = await axios.get('api/watchlist/show/' + userId);
+        const response = await axios.get('api/watchlist/permission/show/' + userId);
         watchlists.value = response.data;
     } catch (error) {
         console.error('Error fetching watchlist:', error.message);
     }
 });
-
 </script>

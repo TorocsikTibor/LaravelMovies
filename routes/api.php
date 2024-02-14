@@ -22,7 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/watchlist/create', [WatchlistController::class, 'create'])->name('createWatchlist');
 Route::get('/watchlist/show/{id}', [WatchlistController::class, 'show']);
+Route::get('/watchlist/permission/show/{id}', [WatchlistController::class, 'getPermissionUserWatchlist']);
 Route::post('/watchlist/movie/add', [WatchlistController::class, 'addMovie']);
 Route::get('/watchlist/movie/list', [WatchlistController::class, 'getWatchlist']);
 Route::post('/watchlist/member/add', [WatchlistController::class, 'addMember']);
+Route::delete('/watchlist/movie/delete/{watchlistId}/{movieId}', [WatchlistController::class, 'deleteFromList']);
 Route::get('/movie', [MovieController::class, 'getAllMovie']);
