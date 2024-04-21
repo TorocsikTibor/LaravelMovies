@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Movie;
 use App\Services\MovieService;
 use App\Services\SearchService;
 use Illuminate\Contracts\View\Factory;
@@ -28,10 +29,11 @@ class MovieController extends Controller
     public function getSearchedMovies(string $search): JsonResponse
     {
         $getApiQuery = $this->searchService->getMovieDBApiQuery($search);
+        $countMovies =  $this->searchService->countSearchInTitle($search);
         $searchedMovie = $this->searchService->searchInTitle($search);
-
-        if ($searchedMovie->isEmpty()) {
-            $searchedMovie = $this->movieService->saveMovies($getApiQuery);
+        if ($countMovies < 10) {
+            $savedApiMovies = $this->movieService->saveMovies($getApiQuery);
+            $searchedMovie = array_merge($searchedMovie, $savedApiMovies);
         }
 
         return response()->json([ 'addedMovies' => $searchedMovie]);

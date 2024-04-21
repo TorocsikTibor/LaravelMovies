@@ -1,6 +1,7 @@
 <template>
+    <search></search>
     <div class="container">
-        <h2 class="p-1">Movies List</h2>
+        <h2 class="p-1">Movie List</h2>
         <div class="row justify-content-center">
             <div class="card-group mt-3">
                 <template v-if="movies && movies.data">
@@ -107,6 +108,7 @@
 
 <script setup>
 import {onMounted, ref} from "vue";
+import Search from "@/components/Search.vue";
 
 const props = defineProps({
     user: Object,
@@ -139,7 +141,6 @@ const fetchMovies = async (page) => {
         console.error('Error fetching movies:', error.message);
     }
 };
-
 
 onMounted(async () => {
     try {

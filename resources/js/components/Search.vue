@@ -8,7 +8,22 @@
                 <div class="col p-2">
                     <input @click="submitSearch" class="btn btn-primary" type="submit" value="Search">
                 </div>
+
+<!--                <div class="col p-2">-->
+<!--                    advance search-->
+<!--                </div>-->
             </div>
+<!--            <div class="row">-->
+<!--                <div class="container rounded border">-->
+<!--                    <div class="col-2">-->
+<!--                        <label class="form-label" for="year">Release year</label>-->
+<!--                        <input class="form-control" type="text" name="year">-->
+<!--                    </div>-->
+<!--                    <div class="col-2">-->
+<!--                        <input class="form-check-input" type="checkbox">-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
 
             <div v-if="responseData">
                 <h2>Search Result</h2>
@@ -65,26 +80,23 @@
     </div>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            searchText: '',
-            responseData: null,
-            error: null,
-        }
-    },
-    methods: {
-        async submitSearch() {
-            try {
-                const response = await axios.get(`/search/${this.searchText}`);
-                this.responseData = response.data.addedMovies;
-            } catch (error) {
-                this.error = error.message;
-            }
-        }
+<script setup>
+import {ref} from "vue";
+
+let searchText = ref("");
+let responseData = ref();
+
+console.log(searchText.value);
+
+const submitSearch = async () => {
+    try {
+        const response = await axios.get(searchText.value === "" ? 'api/movie' : '/search/' + searchText.value);
+        responseData.value = response.data.addedMovies;
+    } catch (error) {
+        console.error(error.message);
     }
 }
+
 </script>
 
 

@@ -34,11 +34,10 @@ class MovieService
     public function saveMovies(mixed $movieArray): array
     {
         $movies = $movieArray;
-
-        $sortedMovies = collect($movies['results'])->sortByDesc('vote_count', SORT_NUMERIC)->values()->all();
+        $selectedMovies = $this->checkMovieTitle($movies);
         $createdMovies = [];
-        $firstThreeMovie = array_slice($sortedMovies, 0, 3);
 
+        $firstThreeMovie = array_slice($selectedMovies, 0, 3);
         foreach ($firstThreeMovie as $movie) {
             $saveMovie = $this->movieRepository->updateOrCreate($movie);
 
@@ -86,6 +85,15 @@ class MovieService
     public function getAllMovie()
     {
         return $this->movieRepository->getAll();
+    }
+
+    public function checkMovieTitle(array $apiMovies): array
+    {
+        $sortApiMovies = collect($apiMovies['results'])->sortByDesc('vote_count', SORT_NUMERIC)->values()->all();
+        $titles = Movie::select('title')->pluck('title')->toArray();
+        $newMovies = collect($sortApiMovies)->whereNotIn("title", $titles)->all();
+
+        return $newMovies;
     }
 
 }

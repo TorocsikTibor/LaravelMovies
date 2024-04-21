@@ -8,6 +8,11 @@ class SearchRepository
 {
     public function searchInTitle(string $searchValue)
     {
-        return Movie::where('title', 'LIKE', '%'.$searchValue.'%')->get();
+        return Movie::where('title', 'LIKE', '%'.$searchValue.'%')->get()->toArray();
+    }
+
+    public function countSearchintitle(string $searchValue)
+    {
+        return Movie::where('title', 'LIKE', '%'.$searchValue.'%')->count();
     }
 }

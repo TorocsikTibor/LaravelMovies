@@ -9,7 +9,7 @@ class MovieRepository
 {
     public function getAll()
     {
-        return Movie::paginate(20);
+        return Movie::orderBy('title', 'asc')->paginate(20);
     }
 
     public function updateOrCreate(array $movie)

@@ -39,4 +39,9 @@ class SearchService
         return $this->searchRepository->searchInTitle($searchValue);
     }
 
+    public function countSearchInTitle(string $searchValue)
+    {
+        return $this->searchRepository->countSearchintitle($searchValue);
+    }
+
 }
