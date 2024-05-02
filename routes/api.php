@@ -28,3 +28,6 @@ Route::get('/watchlist/movie/list', [WatchlistController::class, 'getWatchlist']
 Route::post('/watchlist/member/add', [WatchlistController::class, 'addMember']);
 Route::delete('/watchlist/movie/delete/{watchlistId}/{movieId}', [WatchlistController::class, 'deleteFromList']);
 Route::get('/movie', [MovieController::class, 'getAllMovie']);
+Route::post('/movie/watched/create', [MovieController::class, 'movieWatchedCreate']);
+Route::delete('/movie/watched/delete/{movieId}/{userId}', [MovieController::class, 'movieWatchedDelete']);
+

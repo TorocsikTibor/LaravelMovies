@@ -3,13 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\Movie;
+use App\Models\MovieUser;
 
 
 class MovieRepository
 {
     public function getAll()
     {
-        return Movie::orderBy('title', 'asc')->paginate(20);
+        return Movie::orderBy('title', 'asc')->with('users:id,name')->paginate(20);
     }
 
     public function updateOrCreate(array $movie)

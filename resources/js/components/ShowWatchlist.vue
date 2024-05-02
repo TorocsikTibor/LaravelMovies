@@ -83,6 +83,13 @@
                                                         </div>
                                                     </div>
                                                     <button @click="deleteFromList(movie.id)" type="button" class="btn btn-danger m-1">Delete</button>
+                                                    <button :class="movie.users.map(users => users.id).includes(userId) ? 'btn btn-success' : 'btn btn-secondary'" @click="movie.users.map(users => users.id).includes(userId) ? movieWatchedDelete(movie.id, movie) : movieWatched(movie.id, movie)" data-toggle="tooltip" data-placement="top" :title="getTooltipNames(movie)" type="submit">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+                                                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                                                        </svg>
+                                                        {{movie.users.length}}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -129,7 +136,6 @@
 </template>
 
 <script setup>
-
 import {onMounted, ref} from "vue";
 
 const props = defineProps({
@@ -178,6 +184,37 @@ const deleteFromList = async (movieId) => {
         console.error('Error record to watchlist', error.message);
     }
 }
+
+const movieWatched = async (movieId, movie) => {
+    let data = {
+        'movieId': movieId,
+        'userId': userId
+    }
+
+    try {
+        const response = await axios.post('api/movie/watched/create', data);
+        movie.users.push({ id: userId })
+    } catch (error) {
+        console.error('Error add to watched', error.message);
+    }
+}
+
+const movieWatchedDelete = async (movieId, movie) => {
+    try {
+        await axios.delete('api/movie/watched/delete/' + movieId + '/' + userId);
+        const index = movie.users.findIndex(u => u.id === userId);
+        if (index !== -1) {
+            movie.users.splice(index, 1);
+        }
+    } catch (error) {
+        console.error('Error remove watched', error.message);
+    }
+}
+
+const getTooltipNames = (movie) => {
+    const userNames = movie.users.map(user => user.name).join('\n');
+    return userNames;
+};
 
 onMounted(async () => {
     try {

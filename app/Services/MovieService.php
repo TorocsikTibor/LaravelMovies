@@ -8,6 +8,7 @@ use App\Models\MovieGenre;
 use App\Repositories\GenreRepository;
 use App\Repositories\MovieGenreRepository;
 use App\Repositories\MovieRepository;
+use App\Repositories\MovieUserRepository;
 use Illuminate\Support\Facades\Storage;
 
 class MovieService
@@ -16,6 +17,7 @@ class MovieService
     private MovieRepository $movieRepository;
     private MovieGenreRepository $movieGenreRepository;
     private GenreRepository $genreRepository;
+    private MovieUserRepository $movieUserRepository;
 
 
     public function __construct
@@ -23,12 +25,14 @@ class MovieService
         SearchService $searchService,
         MovieRepository $movieRepository,
         MovieGenreRepository $movieGenreRepository,
-        GenreRepository $genreRepository
+        GenreRepository $genreRepository,
+        MovieUserRepository $movieUserRepository
     ) {
         $this->searchService = $searchService;
         $this->movieRepository = $movieRepository;
         $this->movieGenreRepository = $movieGenreRepository;
         $this->genreRepository = $genreRepository;
+        $this->movieUserRepository = $movieUserRepository;
     }
 
     public function saveMovies(mixed $movieArray): array
@@ -94,6 +98,15 @@ class MovieService
         $newMovies = collect($sortApiMovies)->whereNotIn("title", $titles)->all();
 
         return $newMovies;
+    }
+
+    public function movieWatchedCreate(int $movieId, int $userId)
+    {
+        return $this->movieUserRepository->create($movieId, $userId);
+    }
+    public function movieWatchedDelete(int $movieId, int $userId)
+    {
+        return $this->movieUserRepository->delete($movieId, $userId);
     }
 
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -43,8 +44,13 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function watchlists()
+    public function watchlists(): BelongsToMany
     {
         return $this->belongsToMany(Watchlist::class)->using(UserWatchlist::class);
+    }
+
+    public function movies(): BelongsToMany
+    {
+        return $this->belongsToMany(Movie::class)->using(MovieUser::class);
     }
 }
